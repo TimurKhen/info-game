@@ -1,4 +1,14 @@
 <div class="viewport">
+  <div class="dynamic-island-container" [class.show]="feedbackState() !== null">
+    <div class="dynamic-island" [ngClass]="feedbackState()">
+      <div class="island-content">
+        <span class="icon" *ngIf="feedbackState() === 'correct'">✅</span>
+        <span class="icon" *ngIf="feedbackState() === 'incorrect'">❌</span>
+        <span class="message">{{ feedbackMessage() }}</span>
+      </div>
+    </div>
+  </div>
+
   <div class="task-container" *ngIf="currentTask()">
     <!-- Бекграунд, который видно при свайпе (Подложка) -->
     <div class="swipe-background">

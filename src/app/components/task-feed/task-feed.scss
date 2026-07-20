@@ -183,3 +183,56 @@
   50% { opacity: 1; }
   100% { opacity: 0.6; }
 }
+
+.dynamic-island-container {
+  position: absolute;
+  top: calc(15px + var(--tg-safe-area-inset-top, 0px));
+  left: 0;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: none;
+
+  // Spring animation for natural pop-in feel
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
+  transform: translateY(-150%) scale(0.8);
+  opacity: 0;
+
+  &.show {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.dynamic-island {
+  background: #000;
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  min-width: 150px;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  &.correct {
+    background: rgba(46, 204, 113, 0.15); // Slight tint, mostly black
+    border-color: rgba(46, 204, 113, 0.4);
+  }
+  &.incorrect {
+    background: rgba(231, 76, 60, 0.15);
+    border-color: rgba(231, 76, 60, 0.4);
+  }
+
+  .island-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: 0.3px;
+  }
+}
