@@ -1,0 +1,79 @@
+@import 'tgColors';
+
+.start-container {
+  padding: calc(30px + var(--tg-safe-area-inset-top, 0px))
+           calc(20px + var(--tg-safe-area-inset-right, 0px))
+           calc(80px + var(--tg-safe-area-inset-bottom, 0px))
+           calc(20px + var(--tg-safe-area-inset-left, 0px));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+
+  h2 {
+    text-align: center;
+    color: $tg-text-color;
+    margin-bottom: 30px;
+    font-size: 1.5rem;
+  }
+}
+
+.topics-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
+.difficulty-options {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 40px;
+
+  button {
+    width: 100%;
+  }
+}
+
+// Telegram-styled Outline Buttons for Selection
+.tg-btn-outline {
+  background: transparent;
+  color: $tg-button-color;
+  border: 2px solid $tg-button-color;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &.active, &:active {
+    background-color: rgba($tg-button-color, 0.1);
+  }
+
+  &.active {
+    background-color: $tg-button-color;
+    color: $tg-button-text-color;
+    box-shadow: 0 4px 12px rgba($tg-button-color, 0.3);
+  }
+}
+
+// Telegram-styled Primary Button
+.tg-btn-primary {
+  background-color: $tg-button-color;
+  color: $tg-button-text-color;
+  border: none;
+  border-radius: 12px;
+  padding: 18px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+  width: 100%;
+
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
