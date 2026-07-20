@@ -1,0 +1,26 @@
+<div class="task-card">
+  <div class="task-header">
+    <div class="topic-difficulty">
+      <span class="answered-time">
+        <p>{{data()!.answeredAt | date:'fullDate'}}</p>
+      </span>
+      <span class="is-correct">
+        @if (data()!.correct) {
+          <p>верный ответ</p>
+        } @else {
+          <p>неверный ответ</p>
+        }
+      </span>
+    </div>
+    <pre class="code-snippet"><code>{{ data()!.codeSnippet }}</code></pre>
+  </div>
+
+  <div class="options-list">
+  <button *ngFor="let option of data()!.options"
+          class="option-btn"
+          [class.selected]="data()!.selectedOptionText === option.text"
+          [class.is-correct]="data()!.correctOptionText === option.text">
+    {{ option.text }}
+  </button>
+  </div>
+</div>

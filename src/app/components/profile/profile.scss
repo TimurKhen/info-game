@@ -3,7 +3,7 @@
 .profile-container {
   padding: calc(30px + var(--tg-safe-area-inset-top, 0px))
            calc(20px + var(--tg-safe-area-inset-right, 0px))
-           calc(80px + var(--tg-safe-area-inset-bottom, 0px))
+           calc(120px + var(--tg-safe-area-inset-bottom, 0px))
            calc(20px + var(--tg-safe-area-inset-left, 0px));
   display: flex;
   flex-direction: column;
@@ -53,6 +53,14 @@
     font-size: 1.2rem;
     color: $tg-accent-text-color;
   }
+}
+
+.history {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
 }
 
 .stats-grid {

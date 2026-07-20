@@ -1,5 +1,6 @@
 import { Service } from '@angular/core';
 import { User } from './user';
+import { environment } from '../../environments/environment';
 
 declare global {
   interface Window {
@@ -67,6 +68,8 @@ export class Telegram {
   }
 
   alerter(val: string) {
-    alert(val)
+    if (!environment.production) {
+      alert(val)
+    }
   }
 }
