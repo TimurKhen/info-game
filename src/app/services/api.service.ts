@@ -49,10 +49,6 @@ export class ApiService {
   private http = inject(HttpClient);
   private telegram = inject(Telegram)
 
-  getTopics(): Observable<Topic[]> {
-    return this.http.get<Topic[]>(`${this.baseUrl}/topics`, { headers: this.getHeaders() });
-  }
-
   getFeed(difficulty?: number, topic?: number, limit: number = 10): Observable<Question[]> {
     let params = new HttpParams().set('limit', limit);
     if (difficulty !== undefined) params = params.set('difficulty', difficulty);

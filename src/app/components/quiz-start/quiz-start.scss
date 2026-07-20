@@ -18,9 +18,15 @@
   }
 }
 
+.topics-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
 .difficulty-options {
   display: flex;
-  flex-direction: column;
   gap: 15px;
   margin-bottom: 40px;
 }

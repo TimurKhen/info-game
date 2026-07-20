@@ -60,7 +60,9 @@ export class TaskFeed implements OnInit {
         status: 'pending'
       }));
       this.tasks.update(t => [...t, ...newTasks]);
-    })
+    } catch (error) {
+      console.error('Error loading more tasks:', error);
+    }
   }
 
   selectOption(task: FeedTask, optionId: number) {
