@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AnswerResult, ApiService, Question } from '../../services/api.service';
 import { firstValueFrom } from 'rxjs';
 import { Telegram } from '../../telegram/telegram';
+import { QuizStateService } from '../../services/quiz-state.service';
 
 export interface FeedTask extends Question {
   selectedOption: number | null;
@@ -19,6 +20,7 @@ export interface FeedTask extends Question {
   styleUrl: './task-feed.scss',
 })
 export class TaskFeed implements OnInit {
+  quizStateService = inject(QuizStateService);
   tasks = signal<FeedTask[]>([]);
   currentIndex = signal<number>(0);
 
@@ -27,6 +29,9 @@ export class TaskFeed implements OnInit {
     const index = this.currentIndex();
     return index < allTasks.length ? allTasks[index] : null;
   });
+
+  isFinished = computed(() => this.quizStateService.isFinished());
+  currentTopicName = computed(() => this.quizStateService.currentTopicName());
 
   // Переменные для отслеживания свайпа
   private startX = 0;
@@ -42,18 +47,40 @@ export class TaskFeed implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
-      this.currentTopic = params['topic'] ? Number(params['topic']) : undefined;
-      this.currentDifficulty = params['difficulty'] ? Number(params['difficulty']) : undefined;
-      // Reset state if params change
-      this.tasks.set([]);
-      this.currentIndex.set(0);
-      this.loadMoreTasks();
+      if (params['resume'] === 'true') {
+        this.tasks.set(this.quizStateService.tasks());
+        this.currentIndex.set(this.quizStateService.currentIndex());
+        this.currentTopic = this.quizStateService.currentTopic();
+        this.currentDifficulty = this.quizStateService.currentDifficulty();
+      } else {
+        this.currentTopic = params['topic'] ? Number(params['topic']) : undefined;
+        this.currentDifficulty = params['difficulty'] ? Number(params['difficulty']) : undefined;
+        const topicName = params['topicName'];
+
+        // Reset state if params change
+        this.quizStateService.clearState();
+        this.quizStateService.currentTopic.set(this.currentTopic);
+        this.quizStateService.currentDifficulty.set(this.currentDifficulty);
+        if (topicName) {
+           this.quizStateService.currentTopicName.set(topicName);
+        }
+
+        this.tasks.set([]);
+        this.currentIndex.set(0);
+        this.loadMoreTasks();
+      }
     });
   }
 
   async loadMoreTasks() {
     try {
       const newQuestions = await firstValueFrom(this.apiService.getFeed(this.currentDifficulty, this.currentTopic, 10));
+
+      if (newQuestions.length === 0) {
+        this.quizStateService.isFinished.set(true);
+        return;
+      }
+
       const newTasks: FeedTask[] = newQuestions.map(q => ({
         ...q,
         selectedOption: null,
@@ -61,7 +88,11 @@ export class TaskFeed implements OnInit {
         isSwiping: false,
         status: 'pending'
       }));
-      this.tasks.update(t => [...t, ...newTasks]);
+      this.tasks.update(t => {
+        const updatedTasks = [...t, ...newTasks];
+        this.quizStateService.tasks.set(updatedTasks);
+        return updatedTasks;
+      });
     } catch (error) {
       console.error('Error loading more tasks:', error);
     }
@@ -74,7 +105,11 @@ export class TaskFeed implements OnInit {
   }
 
   private updateTask(updatedTask: FeedTask) {
-    this.tasks.update(tasks => tasks.map(t => t.id === updatedTask.id ? { ...updatedTask } : t));
+    this.tasks.update(tasks => {
+       const updatedTasks = tasks.map(t => t.id === updatedTask.id ? { ...updatedTask } : t);
+       this.quizStateService.tasks.set(updatedTasks);
+       return updatedTasks;
+    });
   }
 
   // === Логика свайпов ===
@@ -173,18 +208,19 @@ export class TaskFeed implements OnInit {
   private nextTask() {
     const nextIdx = this.currentIndex() + 1;
 
+    this.currentIndex.set(nextIdx);
+    this.quizStateService.currentIndex.set(nextIdx);
+
     // Check if we reached the end of the feed (no more tasks returned from API)
     if (nextIdx >= this.tasks().length) {
-      // Go back to topic selection if feed is empty
-      this.router.navigate(['/quiz-start']);
-      return;
+       this.loadMoreTasks();
+    } else if (nextIdx >= this.tasks().length - 3) {
+      this.loadMoreTasks();
     }
+  }
 
-    this.currentIndex.set(nextIdx);
-
-    if (nextIdx >= this.tasks().length - 3) {
-      // TODO:
-      //  когда закончились задания - попап об этом
-    }
+  backToTopics() {
+    this.quizStateService.clearState();
+    this.router.navigate(['/quiz-start']);
   }
 }
