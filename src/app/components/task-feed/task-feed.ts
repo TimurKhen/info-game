@@ -40,7 +40,7 @@ export class TaskFeed implements OnInit {
   }
 
   loadMoreTasks() {
-    this.apiService.getFeed(0, 0, 10).subscribe((val) => {
+    this.apiService.getFeed({topic: 1, difficulty: 2, limit: 5}).subscribe((val) => {
       this.telegram.alerter(JSON.stringify(val))
       const newQuestions = val
       const newTasks: FeedTask[] = newQuestions.map(q => ({
@@ -123,7 +123,7 @@ export class TaskFeed implements OnInit {
 
     if (task.selectedOption !== null) {
       // Fire the API call asynchronously without blocking the UI transition
-      this.apiService.submitAnswer(task.id, { optionId: task.selectedOption }).subscribe({
+      this.apiService.submitAnswer(task.id, task.selectedOption).subscribe({
         error: (e) => console.error('Submit answer failed', e)
       });
     }

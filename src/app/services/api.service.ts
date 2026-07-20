@@ -1,6 +1,12 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
+import { Telegram } from '../telegram/telegram';
+
+export interface Topic {
+  id: number;
+  name: string;
+}
 
 export interface AnswerOption {
   id: number;
@@ -34,30 +40,34 @@ export interface UserStats {
   providedIn: 'root'
 })
 export class ApiService {
-
   private readonly baseUrl = 'https://vibecode.kringeproduction.ru';
+  private http = inject(HttpClient);
+  private telegram = inject(Telegram)
 
-  constructor(private http: HttpClient) { }
+  getFeed(opts?: { topic?: number; difficulty?: number; limit?: number }): Observable<Question[]> {
+    let params = new HttpParams();
+    if (opts?.topic != null)      params = params.set('topic', opts.topic);
+    if (opts?.difficulty != null) params = params.set('difficulty', opts.difficulty);
+    if (opts?.limit != null)      params = params.set('limit', opts.limit);
 
-  private getHeaders(): HttpHeaders {
-    let headers = new HttpHeaders();
-    // Use optional chaining for environments where Telegram WebApp isn't initialized yet
-    const initData = (window as any).Telegram?.WebApp?.initData;
-    if (initData) {
-      headers = headers.set('Authorization', `tma ${initData}`);
-    }
-    return headers;
+    this.telegram.alerter(JSON.stringify(params))
+
+    return this.http.get<Question[]>(`${this.baseUrl}/questions/feed`, { params })
+      .pipe(tap((val) => this.telegram.alerter(JSON.stringify(val))))
   }
 
-  getFeed(difficulty?: number, topic?: number, limit: number = 10): Observable<Question[]> {
-    return this.http.get<Question[]>(`${this.baseUrl}/questions/feed`, { headers: this.getHeaders() });
-  }
-
-  submitAnswer(questionId: number, answer: AnswerRequest): Observable<AnswerResult> {
-    return this.http.post<AnswerResult>(`${this.baseUrl}/questions/${questionId}/answer`, answer, { headers: this.getHeaders() });
+  submitAnswer(questionId: number, optionId: number): Observable<AnswerResult> {
+    return this.http.post<AnswerResult>(
+      `${this.baseUrl}/questions/${questionId}/answer`,
+      { optionId },
+    );
   }
 
   getUserStats(): Observable<UserStats> {
-    return this.http.get<UserStats>(`${this.baseUrl}/users/me/stats`, { headers: this.getHeaders() });
+    return this.http.get<UserStats>(`${this.baseUrl}/users/me/stats`);
+  }
+
+  getTopics(): Observable<Topic[]> {
+    return this.http.get<Topic[]>(`${this.baseUrl}/topics`);
   }
 }
