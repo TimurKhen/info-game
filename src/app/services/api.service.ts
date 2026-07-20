@@ -50,11 +50,7 @@ export class ApiService {
   }
 
   getFeed(difficulty?: number, topic?: number, limit: number = 10): Observable<Question[]> {
-    let params = new HttpParams().set('limit', limit);
-    if (difficulty !== undefined) params = params.set('difficulty', difficulty);
-    if (topic !== undefined) params = params.set('topic', topic);
-
-    return this.http.get<Question[]>(`${this.baseUrl}/questions/feed`, { params, headers: this.getHeaders() });
+    return this.http.get<Question[]>(`${this.baseUrl}/questions/feed`, { headers: this.getHeaders() });
   }
 
   submitAnswer(questionId: number, answer: AnswerRequest): Observable<AnswerResult> {

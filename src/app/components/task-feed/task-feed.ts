@@ -1,7 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, signal, computed } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService, Question } from '../../services/api.service';
 import { firstValueFrom } from 'rxjs';
+import { Telegram } from '../../telegram/telegram';
 
 export interface FeedTask extends Question {
   selectedOption: number | null;
@@ -15,7 +16,6 @@ export interface FeedTask extends Question {
   imports: [CommonModule],
   templateUrl: './task-feed.html',
   styleUrl: './task-feed.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TaskFeed implements OnInit {
   tasks = signal<FeedTask[]>([]);
@@ -32,15 +32,17 @@ export class TaskFeed implements OnInit {
   private currentX = 0;
   private readonly SWIPE_THRESHOLD = 120; // Пикселей для срабатывания
 
-  constructor(private apiService: ApiService) {}
+  private apiService = inject(ApiService)
+  private telegram = inject(Telegram)
 
   ngOnInit() {
     this.loadMoreTasks();
   }
 
-  async loadMoreTasks() {
-    try {
-      const newQuestions = await firstValueFrom(this.apiService.getFeed(undefined, undefined, 10));
+  loadMoreTasks() {
+    this.apiService.getFeed(0, 0, 10).subscribe((val) => {
+      this.telegram.alerter(JSON.stringify(val))
+      const newQuestions = val
       const newTasks: FeedTask[] = newQuestions.map(q => ({
         ...q,
         selectedOption: null,
@@ -49,9 +51,7 @@ export class TaskFeed implements OnInit {
         status: 'pending'
       }));
       this.tasks.update(t => [...t, ...newTasks]);
-    } catch (e) {
-      console.error('Failed to load tasks', e);
-    }
+    })
   }
 
   selectOption(task: FeedTask, optionId: number) {
