@@ -1,0 +1,234 @@
+openapi: 3.0.3
+info:
+  title: Python Output Quiz API
+  description: >
+    Backend for a Telegram Mini App quiz that shows Python code snippets and
+    asks the user to predict their output.
+  version: "1.0.0"
+
+servers:
+  - url: /
+
+tags:
+  - name: system
+  - name: topics
+  - name: questions
+  - name: stats
+
+security:
+  - telegramInitData: []
+
+paths:
+  /healthz:
+    get:
+      tags: [system]
+      summary: Health check
+      security: []
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ok
+
+  /topics:
+    get:
+      tags: [topics]
+      summary: List available topics
+      responses:
+        "200":
+          description: List of topics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Topic"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /questions/feed:
+    get:
+      tags: [questions]
+      summary: Get the next batch of questions not yet answered by the user
+      parameters:
+        - name: difficulty
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 3
+        - name: topic
+          in: query
+          description: Topic id
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        "200":
+          description: Feed of questions (correct answer is not exposed)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Question"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /questions/{id}/answer:
+    post:
+      tags: [questions]
+      summary: Submit an answer for a question
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnswerRequest"
+      responses:
+        "200":
+          description: Result of the submitted answer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnswerResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Question or answer option not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /users/me/stats:
+    get:
+      tags: [stats]
+      summary: Aggregated statistics for the current user
+      responses:
+        "200":
+          description: User statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserStats"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    telegramInitData:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: >
+        Telegram Mini App initData, passed as `Authorization: tma <initData>`.
+        Validated server-side via HMAC-SHA256 against the bot token.
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Missing or invalid Telegram initData
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    Topic:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required: [id, name]
+
+    AnswerOption:
+      type: object
+      description: Correctness of the option is never included here.
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+      required: [id, text]
+
+    Question:
+      type: object
+      properties:
+        id:
+          type: integer
+        topicId:
+          type: integer
+        difficulty:
+          type: integer
+          minimum: 1
+          maximum: 3
+        codeSnippet:
+          type: string
+        options:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnswerOption"
+      required: [id, topicId, difficulty, codeSnippet, options]
+
+    AnswerRequest:
+      type: object
+      properties:
+        optionId:
+          type: integer
+      required: [optionId]
+
+    AnswerResult:
+      type: object
+      properties:
+        correct:
+          type: boolean
+        correctOptionId:
+          type: integer
+      required: [correct, correctOptionId]
+
+    UserStats:
+      type: object
+      properties:
+        totalAnswers:
+          type: integer
+        correctAnswers:
+          type: integer
+        accuracy:
+          type: number
+          format: float
+          description: correctAnswers / totalAnswers, 0 when totalAnswers is 0
+      required: [totalAnswers, correctAnswers, accuracy]
