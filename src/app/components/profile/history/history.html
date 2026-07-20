@@ -6,9 +6,9 @@
       </span>
       <span class="is-correct">
         @if (data()!.correct) {
-          <p>верный ответ</p>
+          <p class="correct">верный ответ</p>
         } @else {
-          <p>неверный ответ</p>
+          <p class="incorrect">неверный ответ</p>
         }
       </span>
     </div>
@@ -16,11 +16,21 @@
   </div>
 
   <div class="options-list">
-  <button *ngFor="let option of data()!.options"
-          class="option-btn"
-          [class.selected]="data()!.selectedOptionText === option.text"
-          [class.is-correct]="data()!.correctOptionText === option.text">
-    {{ option.text }}
-  </button>
+    @for (item of data()!.options; track item) {
+      <span class="option-btn">
+        <p>
+          {{ item.text }}
+        </p>
+        @if (data()!.correctOptionText === item.text) {
+          <span class="correct">
+            <p>✓</p>
+          </span>
+        } @else if (data()!.selectedOptionText === item.text) {
+          <span class="incorrect">
+            <p>✖</p>
+          </span>
+        }
+      </span>
+    }
   </div>
 </div>

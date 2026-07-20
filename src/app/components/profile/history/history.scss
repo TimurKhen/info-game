@@ -38,6 +38,15 @@
     font-size: 0.85rem;
     color: $tg-hint-color;
     margin-bottom: 10px;
+
+    .is-correct {
+      .correct {
+        color: rgba(46, 204, 113, 0.4);
+      }
+      .incorrect {
+        color: $tg-destructive-text-color;
+      }
+    }
   }
 
   h2 {
@@ -65,7 +74,7 @@
 }
 
 .option-btn {
-  background: rgba(255, 255, 255, 0.05);
+  background: $tg-section-bg-color;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: $tg-text-color;
@@ -75,14 +84,29 @@
   font-size: 1rem;
   text-align: left;
   transition: all 0.2s ease;
-  cursor: pointer;
 
-  // Стиль выбранного варианта
-  &.selected {
-    background: rgba($tg-button-color, 0.8);
-    color: $tg-button-text-color;
-    border-color: transparent;
-    transform: scale(1.02);
-    box-shadow: 0 4px 15px rgba($tg-button-color, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  span {
+    padding: 8px;
+    border-radius: 999px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    aspect-ratio: 1/1;
+    height: 80%;
+    width: auto;
+
+    &.correct {
+      background: rgba(46, 204, 113, 0.15);
+      border-color: rgba(46, 204, 113, 0.4);
+    }
+    &.incorrect {
+      background: rgba(231, 76, 60, 0.15);
+      border-color: rgba(231, 76, 60, 0.4);
+    }
   }
 }

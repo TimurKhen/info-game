@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { Telegram } from '../telegram/telegram';
 
 export interface Topic {
@@ -48,6 +48,7 @@ export interface HistoryQuestion {
   correctOptionText: string;
   correct: boolean;
   answeredAt: string;
+  options: AnswerOption[];
 }
 
 @Injectable({
