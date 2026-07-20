@@ -2,7 +2,9 @@ import { Service } from '@angular/core';
 
 @Service()
 export class CloudStorage {
-  private cloudStorage = window.Telegram.WebApp.CloudStorage;
+  private get cloudStorage() {
+    return window.Telegram?.WebApp?.CloudStorage;
+  }
 
   constructor() {}
 

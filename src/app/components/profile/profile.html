@@ -1,0 +1,29 @@
+<div class="profile-container">
+  <div class="user-info" *ngIf="user()">
+    <img [src]="user().photo_url || 'https://via.placeholder.com/80'" alt="Avatar" class="avatar">
+    <h2>{{ user().first_name }} {{ user().last_name }}</h2>
+    <p class="username" *ngIf="user().username">@{{ user().username }}</p>
+  </div>
+
+  <div class="stats-card" *ngIf="stats()">
+    <h3>Your Progress</h3>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <span class="value">{{ stats()!.totalAnswers }}</span>
+        <span class="label">Total Tasks</span>
+      </div>
+      <div class="stat-item">
+        <span class="value">{{ stats()!.correctAnswers }}</span>
+        <span class="label">Solved</span>
+      </div>
+      <div class="stat-item">
+        <span class="value">{{ (stats()!.accuracy * 100) | number:'1.0-1' }}%</span>
+        <span class="label">Accuracy</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="!stats()">
+    <p>Loading stats...</p>
+  </div>
+</div>
