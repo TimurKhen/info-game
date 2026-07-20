@@ -1,13 +1,15 @@
 @import 'tgColors';
 
 .profile-container {
-  padding: 30px 20px;
+  padding: calc(30px + var(--tg-safe-area-inset-top, 0px))
+           calc(20px + var(--tg-safe-area-inset-right, 0px))
+           calc(80px + var(--tg-safe-area-inset-bottom, 0px))
+           calc(20px + var(--tg-safe-area-inset-left, 0px));
   display: flex;
   flex-direction: column;
   align-items: center;
   height: 100%;
   overflow-y: auto;
-  padding-bottom: 80px; /* Space for bottom nav */
 }
 
 .user-info {
