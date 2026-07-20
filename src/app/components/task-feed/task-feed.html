@@ -1,47 +1,50 @@
-<cdk-virtual-scroll-viewport
-  itemSize="100vh"
-  class="viewport"
-  (scrolledIndexChange)="onScrollIndexChange($event)">
-
-  <div *cdkVirtualFor="let task of tasks" class="task-container">
-
+<div class="viewport">
+  <div class="task-container" *ngIf="currentTask()">
     <!-- Бекграунд, который видно при свайпе (Подложка) -->
     <div class="swipe-background">
-      <div class="skip-bg" [style.opacity]="task.swipeOffset > 0 ? 1 : 0">
+      <div class="skip-bg" [style.opacity]="currentTask()!.swipeOffset > 0 ? 1 : 0">
         <span>Пропустить ⏭</span>
       </div>
-      <div class="confirm-bg" [style.opacity]="task.swipeOffset < 0 ? 1 : 0">
+      <div class="confirm-bg" [style.opacity]="currentTask()!.swipeOffset < 0 ? 1 : 0">
         <span>Подтвердить ✅</span>
       </div>
     </div>
 
     <!-- Основная карточка задачи -->
     <div class="task-card"
-         [class.swiping]="task.isSwiping"
-         [class.answered]="task.status !== 'pending'"
-         [style.transform]="'translateX(' + task.swipeOffset + 'px)'"
-         (touchstart)="onTouchStart($event, task)"
-         (touchmove)="onTouchMove($event, task)"
-         (touchend)="onTouchEnd(task)">
+         [class.swiping]="currentTask()!.isSwiping"
+         [class.answered]="currentTask()!.status !== 'pending'"
+         [style.transform]="getTransform(currentTask()!)"
+         (touchstart)="onTouchStart($event, currentTask()!)"
+         (touchmove)="onTouchMove($event, currentTask()!)"
+         (touchend)="onTouchEnd(currentTask()!)">
 
       <div class="task-header">
-        <h2>{{ task.description }}</h2>
+        <div class="topic-difficulty">
+          <span class="topic">Topic ID: {{ currentTask()!.topicId }}</span>
+          <span class="difficulty">Difficulty: {{ currentTask()!.difficulty }}</span>
+        </div>
+        <h2>Predict the Output:</h2>
+        <pre class="code-snippet"><code>{{ currentTask()!.codeSnippet }}</code></pre>
       </div>
 
       <div class="options-list">
-        <button *ngFor="let option of task.options"
+        <button *ngFor="let option of currentTask()!.options"
                 class="option-btn"
-                [class.selected]="task.selectedOption === option"
-                (click)="selectOption(task, option)">
-          {{ option }}
+                [class.selected]="currentTask()!.selectedOption === option.id"
+                (click)="selectOption(currentTask()!, option.id)">
+          {{ option.text }}
         </button>
       </div>
 
-      <div class="swipe-hint" *ngIf="task.selectedOption && task.status === 'pending'">
+      <div class="swipe-hint" *ngIf="currentTask()!.selectedOption && currentTask()!.status === 'pending'">
         <p>Свайп влево — подтвердить<br>Свайп вправо — пропустить</p>
       </div>
 
     </div>
   </div>
 
-</cdk-virtual-scroll-viewport>
+  <div class="no-tasks" *ngIf="!currentTask()">
+    <p>Loading more tasks...</p>
+  </div>
+</div>

@@ -1,11 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Telegram } from './telegram/telegram';
-import { TaskFeed } from "./components/task-feed/task-feed";
+import { BottomNavComponent } from './components/bottom-nav/bottom-nav';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, TaskFeed],
+  imports: [RouterOutlet, BottomNavComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

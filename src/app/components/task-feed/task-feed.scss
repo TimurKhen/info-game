@@ -5,12 +5,8 @@
   height: 100vh;
   width: 100vw;
   overflow-x: hidden;
-  overflow-y: auto;
-  background-color: $tg-secondary-bg-color;
-
-  // Включаем CSS-примагничивание
-  scroll-snap-type: y mandatory;
-  scroll-behavior: smooth;
+  overflow-y: hidden; // Disabled scrolling as we only show one card now
+  background: transparent; // Let the body's orbs shine through
 }
 
 // Контейнер одной задачи — занимает ровно 1 экран
@@ -58,17 +54,21 @@
 /* --- Основная карточка задачи --- */
 .task-card {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 20px; left: 20px; right: 20px; bottom: 100px; // Spacing for glass effect and bottom nav
   z-index: 2;
-  background-color: $tg-bg-color;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
   color: $tg-text-color;
-  padding: 40px 20px;
+  padding: 30px 20px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
 
   // Плавный возврат на место, если отпустили недосвайпнув
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s;
 
   // Когда мы тапаем и тянем, отключаем transition, чтобы карточка следовала за пальцем
   &.swiping {
@@ -84,9 +84,29 @@
 
 .task-header {
   margin-bottom: 30px;
+
+  .topic-difficulty {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: $tg-hint-color;
+    margin-bottom: 10px;
+  }
+
   h2 {
     font-size: 1.25rem;
     line-height: 1.4;
+    margin-bottom: 10px;
+  }
+
+  .code-snippet {
+    background-color: #282c34;
+    color: #abb2bf;
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: monospace;
+    font-size: 0.95rem;
   }
 }
 
@@ -98,10 +118,12 @@
 }
 
 .option-btn {
-  background-color: $tg-secondary-bg-color;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: $tg-text-color;
-  border: 1px solid $tg-hint-color;
-  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
   padding: 16px;
   font-size: 1rem;
   text-align: left;
@@ -110,19 +132,30 @@
 
   // Стиль выбранного варианта
   &.selected {
-    background-color: $tg-button-color;
+    background: rgba($tg-button-color, 0.8);
     color: $tg-button-text-color;
-    border-color: $tg-button-color;
+    border-color: transparent;
     transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba($tg-button-color, 0.4);
   }
 }
 
 .swipe-hint {
   margin-top: auto;
   text-align: center;
-  color: $tg-hint-color;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.9rem;
   animation: pulse 2s infinite;
+}
+
+.no-tasks {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: rgba(255,255,255,0.8);
+  font-size: 1.2rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 @keyframes pulse {
