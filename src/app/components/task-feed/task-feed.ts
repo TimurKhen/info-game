@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiService, Question } from '../../services/api.service';
+import { AnswerResult, ApiService, Question } from '../../services/api.service';
 import { firstValueFrom } from 'rxjs';
 import { Telegram } from '../../telegram/telegram';
 
@@ -35,8 +35,10 @@ export class TaskFeed implements OnInit {
 
   private currentTopic: number | undefined;
   private currentDifficulty: number | undefined;
+  feedbackState = signal<'correct' | 'incorrect' | null>(null);
+  feedbackMessage = signal<string>('');
 
-  constructor(private apiService: ApiService, private route: ActivatedRoute, private router: Router) {}
+  constructor(private telegram: Telegram, private apiService: ApiService, private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -128,18 +130,37 @@ export class TaskFeed implements OnInit {
   }
 
   private confirmTask(task: FeedTask) {
-    task.swipeOffset = -window.innerWidth; // Уводим экран влево
+    task.swipeOffset = -window.innerWidth;
     task.status = 'confirmed';
     this.updateTask(task);
 
     if (task.selectedOption !== null) {
-      // Fire the API call asynchronously without blocking the UI transition
       this.apiService.submitAnswer(task.id, task.selectedOption).subscribe({
-        error: (e) => console.error('Submit answer failed', e)
+        next: (res: AnswerResult) => {
+          // Assuming the API returns whether the answer was correct.
+          // Update `res.isCorrect` to match your actual API response property.
+          this.telegram.alerter(JSON.stringify(res));
+          const isCorrect = res.correct;
+          this.showDynamicIsland(isCorrect);
+        },
+        error: (e) => {
+          console.error('Submit answer failed', e);
+          this.showDynamicIsland(false); // Default to error state if request fails
+        }
       });
     }
 
     setTimeout(() => this.nextTask(), 300);
+  }
+
+  private showDynamicIsland(isCorrect: boolean) {
+    this.feedbackState.set(isCorrect ? 'correct' : 'incorrect');
+    this.feedbackMessage.set(isCorrect ? 'Верно!' : 'Неверно!');
+
+    // Hide the dynamic island after 2.5 seconds
+    setTimeout(() => {
+      this.feedbackState.set(null);
+    }, 2500);
   }
 
   private skipTask(task: FeedTask) {
