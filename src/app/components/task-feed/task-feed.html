@@ -3,11 +3,11 @@
     <!-- Бекграунд, который видно при свайпе (Подложка) -->
     <div class="swipe-background">
       <div class="skip-bg" [style.opacity]="currentTask()!.swipeOffset > 0 ? 1 : 0">
-        <span>Пропустить ❌</span>
+        <span>Пропустить</span>
       </div>
       <!-- Показываем зеленую подложку только если выбран ответ -->
       <div class="confirm-bg" [style.opacity]="(currentTask()!.swipeOffset < 0 && currentTask()!.selectedOption) ? 1 : 0">
-        <span>Подтвердить ✅</span>
+        <span>Подтвердить</span>
       </div>
     </div>
 

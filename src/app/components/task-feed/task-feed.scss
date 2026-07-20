@@ -11,11 +11,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 // Контейнер одной задачи — занимает ровно 1 экран
 .task-container {
-  height: 80vh;
+  height: 90dvh;
   width: 100vw;
   position: relative;
   scroll-snap-align: start; // Магнит к началу блока
@@ -43,15 +47,24 @@
   }
 
   .skip-bg {
-    background-color: $tg-destructive-text-color; // Красный из темы TG
+    background: linear-gradient(to right, $tg-destructive-text-color, rgba(0,0,0,0));
+    // background-color: $tg-destructive-text-color; // Красный из темы TG
     color: $tg-button-text-color;
     justify-content: flex-start;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .confirm-bg {
-    background-color: $tg-button-color; // Синий/Акцентный из темы TG
+    background: linear-gradient(to left, $tg-button-color, rgba(0,0,0,0));
     color: $tg-button-text-color;
     justify-content: flex-end;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }
 
