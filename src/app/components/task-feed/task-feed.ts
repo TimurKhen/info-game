@@ -72,8 +72,8 @@ export class TaskFeed implements OnInit {
   }
 
   onTouchStart(event: TouchEvent, task: FeedTask) {
-    // Свайпать можно только если выбран вариант ответа
-    if (!task.selectedOption || task.status !== 'pending') return;
+    // Убрали проверку на !task.selectedOption. Теперь свайпать можно всегда.
+    if (task.status !== 'pending') return;
 
     this.startX = event.touches[0].clientX;
     task.isSwiping = true;
@@ -84,9 +84,14 @@ export class TaskFeed implements OnInit {
     if (!task.isSwiping) return;
 
     this.currentX = event.touches[0].clientX;
-    const deltaX = this.currentX - this.startX;
+    let deltaX = this.currentX - this.startX;
 
-    // Блокируем свайп, если он слишком слабый (защита от случайных дрожаний)
+    // Если ответ НЕ выбран, не даем полноценно свайпать влево (на подтверждение).
+    // Создаем эффект "резинки" (сильное сопротивление движению влево).
+    if (!task.selectedOption && deltaX < 0) {
+      deltaX = deltaX * 0.15;
+    }
+
     task.swipeOffset = deltaX;
     this.updateTask(task);
   }
@@ -95,18 +100,20 @@ export class TaskFeed implements OnInit {
     if (!task.isSwiping) return;
     task.isSwiping = false;
 
-    // Свайп влево (отрицательный offset) -> Подтвердить (Confirm)
-    if (task.swipeOffset < -this.SWIPE_THRESHOLD) {
+    // Свайп влево (отрицательный offset) -> Подтвердить (только если ВЫБРАН ОТВЕТ)
+    if (task.swipeOffset < -this.SWIPE_THRESHOLD && task.selectedOption) {
       this.confirmTask(task);
     }
-    // Свайп вправо (положительный offset) -> Пропустить (Skip)
+    // Свайп вправо (положительный offset) -> Пропустить (можно БЕЗ ответа)
     else if (task.swipeOffset > this.SWIPE_THRESHOLD) {
       this.skipTask(task);
     }
-    // Возврат в исходное положение
+    // Если недотянули или пытались свайпнуть влево без ответа — возвращаем на место
     else {
       task.swipeOffset = 0;
     }
+
+    this.updateTask(task);
   }
 
   private confirmTask(task: FeedTask) {

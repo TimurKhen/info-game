@@ -3,9 +3,10 @@
     <!-- Бекграунд, который видно при свайпе (Подложка) -->
     <div class="swipe-background">
       <div class="skip-bg" [style.opacity]="currentTask()!.swipeOffset > 0 ? 1 : 0">
-        <span>Пропустить ⏭</span>
+        <span>Пропустить ❌</span>
       </div>
-      <div class="confirm-bg" [style.opacity]="currentTask()!.swipeOffset < 0 ? 1 : 0">
+      <!-- Показываем зеленую подложку только если выбран ответ -->
+      <div class="confirm-bg" [style.opacity]="(currentTask()!.swipeOffset < 0 && currentTask()!.selectedOption) ? 1 : 0">
         <span>Подтвердить ✅</span>
       </div>
     </div>
@@ -37,10 +38,16 @@
         </button>
       </div>
 
-      <div class="swipe-hint" *ngIf="currentTask()!.selectedOption && currentTask()!.status === 'pending'">
-        <p>Свайп влево — подтвердить<br>Свайп вправо — пропустить</p>
+      <div class="swipe-hint" *ngIf="currentTask()!.status === 'pending'">
+        <p *ngIf="currentTask()!.selectedOption">
+          Свайп влево — подтвердить<br>
+          Свайп вправо — пропустить
+        </p>
+        <p *ngIf="!currentTask()!.selectedOption">
+          Свайп вправо — пропустить<br>
+          <span style="font-size: 0.85em; opacity: 0.7;">Выберите ответ, чтобы подтвердить</span>
+        </p>
       </div>
-
     </div>
   </div>
 

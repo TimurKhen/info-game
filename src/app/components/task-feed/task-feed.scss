@@ -2,16 +2,20 @@
 
 // Виртуальный скролл на весь экран приложения
 .viewport {
-  height: 100vh;
+  height: 100dvh;
   width: 100vw;
   overflow-x: hidden;
   overflow-y: hidden; // Disabled scrolling as we only show one card now
   background: transparent; // Let the body's orbs shine through
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 // Контейнер одной задачи — занимает ровно 1 экран
 .task-container {
-  height: 100vh;
+  height: 80vh;
   width: 100vw;
   position: relative;
   scroll-snap-align: start; // Магнит к началу блока
@@ -40,7 +44,7 @@
 
   .skip-bg {
     background-color: $tg-destructive-text-color; // Красный из темы TG
-    color: #fff;
+    color: $tg-button-text-color;
     justify-content: flex-start;
   }
 
@@ -100,8 +104,8 @@
   }
 
   .code-snippet {
-    background-color: #282c34;
-    color: #abb2bf;
+    background-color: $tg-secondary-bg-color;
+    color: $tg-hint-color;
     padding: 15px;
     border-radius: 8px;
     overflow-x: auto;
@@ -143,7 +147,7 @@
 .swipe-hint {
   margin-top: auto;
   text-align: center;
-  color: rgba(255, 255, 255, 0.7);
+  color: $tg-hint-color;
   font-size: 0.9rem;
   animation: pulse 2s infinite;
 }
