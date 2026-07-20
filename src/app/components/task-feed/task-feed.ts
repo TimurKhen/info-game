@@ -148,7 +148,7 @@ export class TaskFeed implements OnInit {
     // Check if we reached the end of the feed (no more tasks returned from API)
     if (nextIdx >= this.tasks().length) {
       // Go back to topic selection if feed is empty
-      this.router.navigate(['/select-topic']);
+      this.router.navigate(['/quiz-start']);
       return;
     }
 
