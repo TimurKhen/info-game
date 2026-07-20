@@ -138,7 +138,7 @@
 }
 
 .option-btn {
-  background: rgba(255, 255, 255, 0.05);
+  background: $tg-section-bg-color;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: $tg-text-color;

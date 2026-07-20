@@ -2,7 +2,6 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService, HistoryQuestion, UserStats } from '../../services/api.service';
 import { Telegram } from '../../telegram/telegram';
-import { firstValueFrom } from 'rxjs';
 import { History } from "./history/history";
 
 @Component({
