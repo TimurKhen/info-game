@@ -7,5 +7,5 @@ services:
       dockerfile: Dockerfile
     container_name: vibe-ton-frontend
     ports:
-      - "8080:80"
+      - "8088:80"
     restart: unless-stopped
