@@ -1,46 +1,61 @@
-@import 'tgColors';
+@import 'tgColors.scss';
 
-.bottom-nav {
+.container {
+  width: 100%;
   display: flex;
-  justify-content: space-around;
-  align-items: center;
-  height: 60px;
-  background-color: $tg-secondary-bg-color;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(16px);
+  justify-content: center;
+  margin-bottom: 20px;
+
+  /* Фиксируем внизу, как было в первом варианте */
   position: fixed;
   bottom: 0;
-  width: 100%;
   z-index: 1000;
-}
 
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  color: $tg-hint-color;
-  transition: all 0.2s ease;
-  flex: 1;
-  height: 100%;
+  .footer {
+    padding-top: 4px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.1);
+    height: 52px;
+    width: 80%;
+    border-radius: 20px;
+    background: $tg-section-bg-color;
+    display: flex;
+    justify-content: space-around;
 
-  .icon {
-    font-size: 24px;
-    margin-bottom: 2px;
-  }
+    .nav-item {
+      box-sizing: border-box;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      text-decoration: none;
 
-  .label {
-    font-size: 10px;
-    font-weight: 500;
-  }
+      /* По умолчанию цвет текста и иконки неактивный */
+      color: $tg-accent-text-color;
+      transition: all 0.2s ease;
+      flex: 1;
 
-  &.active {
-    color: $tg-button-color;
-    transform: translateY(-2px);
+      .icon {
+        font-size: 20px;
+        transition: transform 0.2s ease;
+      }
 
-    .icon {
-      transform: scale(1.1);
+      p {
+        margin: 0; // Сбрасываем стандартные отступы тега <p>
+        color: inherit; // Наследуем цвет, чтобы он менялся при active
+        font-size: 1.1cap;
+        font-weight: 500;
+      }
+
+      /* Анимация и смена цвета при активном роуте */
+      &.active {
+        color: $tg-button-color;
+        transform: translateY(-2px);
+
+        .icon {
+          transform: scale(1.1);
+        }
+      }
     }
   }
 }

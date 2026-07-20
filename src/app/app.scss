@@ -1,0 +1,27 @@
+@import 'tgColors.scss';
+
+.container {
+  display: flex;
+  flex-direction: column;
+
+  background-color: $tg-secondary-bg-color;
+
+  padding-top: max(12px, var(--tg-content-safe-area-inset-top, 0px));
+  padding-bottom: var(--tg-content-safe-area-inset-bottom);
+  padding-left: 0;
+  padding-right: 0;
+  border-radius: 12px;
+  margin-top: 20px;
+
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+
+  app-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+  }
+}
