@@ -1,0 +1,10 @@
+<div class="start-container">
+  <h2>Select Difficulty</h2>
+  <div class="difficulty-options">
+    <button class="tg-btn-outline" (click)="selectDifficulty(1)" [class.active]="selectedDifficulty() === 1">Easy</button>
+    <button class="tg-btn-outline" (click)="selectDifficulty(2)" [class.active]="selectedDifficulty() === 2">Medium</button>
+    <button class="tg-btn-outline" (click)="selectDifficulty(3)" [class.active]="selectedDifficulty() === 3">Hard</button>
+  </div>
+
+  <button class="tg-btn-primary" (click)="startTasks()">Start</button>
+</div>

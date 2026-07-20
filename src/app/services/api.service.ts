@@ -36,6 +36,11 @@ export interface UserStats {
   accuracy: number;
 }
 
+export interface Topic {
+  id: number;
+  name: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -44,12 +49,14 @@ export class ApiService {
   private http = inject(HttpClient);
   private telegram = inject(Telegram)
 
-  getFeed(opts?: { topic?: number; difficulty?: number; limit?: number }): Observable<Question[]> {
-    let params = new HttpParams();
-    if (opts?.topic != null)      params = params.set('topic', opts.topic);
-    if (opts?.difficulty != null) params = params.set('difficulty', opts.difficulty);
-    if (opts?.limit != null)      params = params.set('limit', opts.limit);
+  getTopics(): Observable<Topic[]> {
+    return this.http.get<Topic[]>(`${this.baseUrl}/topics`, { headers: this.getHeaders() });
+  }
 
+  getFeed(difficulty?: number, topic?: number, limit: number = 10): Observable<Question[]> {
+    let params = new HttpParams().set('limit', limit);
+    if (difficulty !== undefined) params = params.set('difficulty', difficulty);
+    if (topic !== undefined) params = params.set('topic', topic);
     this.telegram.alerter(JSON.stringify(params))
 
     return this.http.get<Question[]>(`${this.baseUrl}/questions/feed`, { params })
