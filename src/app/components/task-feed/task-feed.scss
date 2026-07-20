@@ -173,15 +173,15 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  color: rgba(255,255,255,0.8);
+  color: $tg-hint-color;
   font-size: 1.2rem;
   text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 @keyframes pulse {
-  0% { opacity: 0.6; }
+  0% { opacity: 0.8; }
   50% { opacity: 1; }
-  100% { opacity: 0.6; }
+  100% { opacity: 0.8; }
 }
 
 .dynamic-island-container {
