@@ -41,11 +41,20 @@ export interface Topic {
   name: string;
 }
 
+export interface HistoryQuestion {
+  questionId: number;
+  codeSnippet: string;
+  selectedOptionText: string;
+  correctOptionText: string;
+  correct: boolean;
+  answeredAt: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly baseUrl = 'https://vibecode.kringeproduction.ru';
+  private readonly baseUrl = 'https://vibecode.kringeproduction.ru/api';
   private http = inject(HttpClient);
   private telegram = inject(Telegram)
 
@@ -72,5 +81,9 @@ export class ApiService {
 
   getTopics(): Observable<Topic[]> {
     return this.http.get<Topic[]>(`${this.baseUrl}/topics`);
+  }
+
+  getHistory(): Observable<HistoryQuestion[]> {
+    return this.http.get<HistoryQuestion[]>(`${this.baseUrl}/users/me/history`);
   }
 }

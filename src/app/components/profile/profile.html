@@ -24,6 +24,12 @@
         </div>
       </div>
     </div>
+
+    <div class="history">
+      @for (item of history(); track item) {
+        <app-history [data]="item"></app-history>
+      }
+    </div>
   } @else {
     <div class="loading">
       <p>Loading stats...</p>
