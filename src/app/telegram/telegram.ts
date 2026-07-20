@@ -23,18 +23,6 @@ export class Telegram {
   }
 
   get user(): User {
-    if (!this.isAvailable) {
-      return {
-        id: 99999999,
-        first_name: 'Разработчик',
-        last_name: 'Локальный',
-        username: 'dev_local',
-        language_code: 'ru',
-        allows_write_to_pm: true,
-        photo_url:
-          'https://abrakadabra.fun/uploads/posts/2022-02/1644169591_2-abrakadabra-fun-p-avatarka-s-ulibkoi-3.png',
-      };
-    }
     return this.tg.initDataUnsafe?.user;
   }
 
@@ -76,5 +64,9 @@ export class Telegram {
     } else {
       console.log('[TG-Mock]: App disableClosingConfirmation');
     }
+  }
+
+  alerter(val: string) {
+    alert(val)
   }
 }
