@@ -1,5 +1,12 @@
 <div class="start-container">
-  <h2>Select Difficulty</h2>
+  <h2>Выберите тему</h2>
+  <div class="topics-options">
+    @for (item of topics(); track item; let i = $index) {
+      <button class="tg-btn-outline" (click)="selectTheme(i, item.id)" [class.active]="selectedTheme() === i">{{item.name}}</button>
+    }
+  </div>
+
+  <h2>Выберите сложность</h2>
   <div class="difficulty-options">
     <button class="tg-btn-outline" (click)="selectDifficulty(1)" [class.active]="selectedDifficulty() === 1">Easy</button>
     <button class="tg-btn-outline" (click)="selectDifficulty(2)" [class.active]="selectedDifficulty() === 2">Medium</button>

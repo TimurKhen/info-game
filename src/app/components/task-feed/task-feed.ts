@@ -168,9 +168,9 @@ export class TaskFeed implements OnInit {
 
     this.currentIndex.set(nextIdx);
 
-    // Load more when approaching the end
     if (nextIdx >= this.tasks().length - 3) {
-      this.loadMoreTasks();
+      // TODO:
+      //  когда закончились задания - попап об этом
     }
   }
 }
