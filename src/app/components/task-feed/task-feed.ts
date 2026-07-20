@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService, Question } from '../../services/api.service';
 import { firstValueFrom } from 'rxjs';
 
@@ -32,15 +33,25 @@ export class TaskFeed implements OnInit {
   private currentX = 0;
   private readonly SWIPE_THRESHOLD = 120; // Пикселей для срабатывания
 
-  constructor(private apiService: ApiService) {}
+  private currentTopic: number | undefined;
+  private currentDifficulty: number | undefined;
+
+  constructor(private apiService: ApiService, private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit() {
-    this.loadMoreTasks();
+    this.route.queryParams.subscribe(params => {
+      this.currentTopic = params['topic'] ? Number(params['topic']) : undefined;
+      this.currentDifficulty = params['difficulty'] ? Number(params['difficulty']) : undefined;
+      // Reset state if params change
+      this.tasks.set([]);
+      this.currentIndex.set(0);
+      this.loadMoreTasks();
+    });
   }
 
   async loadMoreTasks() {
     try {
-      const newQuestions = await firstValueFrom(this.apiService.getFeed(undefined, undefined, 10));
+      const newQuestions = await firstValueFrom(this.apiService.getFeed(this.currentDifficulty, this.currentTopic, 10));
       const newTasks: FeedTask[] = newQuestions.map(q => ({
         ...q,
         selectedOption: null,
@@ -133,6 +144,14 @@ export class TaskFeed implements OnInit {
 
   private nextTask() {
     const nextIdx = this.currentIndex() + 1;
+
+    // Check if we reached the end of the feed (no more tasks returned from API)
+    if (nextIdx >= this.tasks().length) {
+      // Go back to topic selection if feed is empty
+      this.router.navigate(['/select-topic']);
+      return;
+    }
+
     this.currentIndex.set(nextIdx);
 
     // Load more when approaching the end

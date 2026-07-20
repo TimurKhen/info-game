@@ -1,0 +1,22 @@
+<div class="topic-container">
+  <h2>Select Topic</h2>
+  <div class="topic-list" *ngIf="topics().length > 0; else loading">
+    <button *ngFor="let topic of topics()"
+            class="topic-btn"
+            (click)="selectTopic(topic.id)">
+      {{ topic.name }}
+    </button>
+  </div>
+  <ng-template #loading>
+    <div class="loading">Loading topics...</div>
+  </ng-template>
+
+  <h2>Select Difficulty</h2>
+  <div class="difficulty-list">
+    <button class="topic-btn" (click)="selectDifficulty(1)" [class.selected]="selectedDifficulty() === 1">Easy</button>
+    <button class="topic-btn" (click)="selectDifficulty(2)" [class.selected]="selectedDifficulty() === 2">Medium</button>
+    <button class="topic-btn" (click)="selectDifficulty(3)" [class.selected]="selectedDifficulty() === 3">Hard</button>
+  </div>
+
+  <button class="start-btn" [disabled]="!selectedTopic()" (click)="startTasks()">Start</button>
+</div>

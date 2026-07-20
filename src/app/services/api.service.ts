@@ -30,6 +30,11 @@ export interface UserStats {
   accuracy: number;
 }
 
+export interface Topic {
+  id: number;
+  name: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -47,6 +52,10 @@ export class ApiService {
       headers = headers.set('Authorization', `tma ${initData}`);
     }
     return headers;
+  }
+
+  getTopics(): Observable<Topic[]> {
+    return this.http.get<Topic[]>(`${this.baseUrl}/topics`, { headers: this.getHeaders() });
   }
 
   getFeed(difficulty?: number, topic?: number, limit: number = 10): Observable<Question[]> {
