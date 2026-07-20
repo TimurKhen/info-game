@@ -1,36 +1,38 @@
-<div class="task-card">
-  <div class="task-header">
-    <div class="topic-difficulty">
-      <span class="answered-time">
-        <p>{{data()!.answeredAt | date:'fullDate'}}</p>
-      </span>
-      <span class="is-correct">
-        @if (data()!.correct) {
-          <p class="correct">верный ответ</p>
-        } @else {
-          <p class="incorrect">неверный ответ</p>
-        }
-      </span>
+@if (data()) {
+  <div class="task-card">
+    <div class="task-header">
+      <div class="topic-difficulty">
+        <span class="answered-time">
+          <p>{{data()!.answeredAt | date:'fullDate'}}</p>
+        </span>
+        <span class="is-correct">
+          @if (data()!.correct) {
+            <p class="correct">верный ответ</p>
+          } @else {
+            <p class="incorrect">неверный ответ</p>
+          }
+        </span>
+      </div>
+      <pre class="code-snippet"><code>{{ data()!.codeSnippet }}</code></pre>
     </div>
-    <pre class="code-snippet"><code>{{ data()!.codeSnippet }}</code></pre>
-  </div>
 
-  <div class="options-list">
-    @for (item of data()!.options; track item) {
-      <span class="option-btn">
-        <p>
-          {{ item.text }}
-        </p>
-        @if (data()!.correctOptionText === item.text) {
-          <span class="correct">
-            <p>✓</p>
-          </span>
-        } @else if (data()!.selectedOptionText === item.text) {
-          <span class="incorrect">
-            <p>✖</p>
-          </span>
-        }
-      </span>
-    }
+    <div class="options-list">
+      @for (item of data()!.options; track item) {
+        <span class="option-btn">
+          <p>
+            {{ item.text }}
+          </p>
+          @if (data()!.correctOptionText === item.text) {
+            <span class="correct">
+              <p>✓</p>
+            </span>
+          } @else if (data()!.selectedOptionText === item.text) {
+            <span class="incorrect">
+              <p>✖</p>
+            </span>
+          }
+        </span>
+      }
+    </div>
   </div>
-</div>
+}
