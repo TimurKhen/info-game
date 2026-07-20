@@ -1,13 +1,14 @@
 import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { routes } from './app.routes';
-import { telegramAuthInterceptor } from './services/auth.interceptor';
+import { ErrorInterceptor } from './services/http-interceptors/error-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    // provideZonelessChangeDetection(),
+    provideZonelessChangeDetection(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([telegramAuthInterceptor])),
+    provideHttpClient(withInterceptorsFromDi()),
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
   ]
 };
