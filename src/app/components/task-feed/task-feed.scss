@@ -1,0 +1,132 @@
+@import 'tgColors';
+
+// Виртуальный скролл на весь экран приложения
+.viewport {
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: $tg-secondary-bg-color;
+
+  // Включаем CSS-примагничивание
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+// Контейнер одной задачи — занимает ровно 1 экран
+.task-container {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  scroll-snap-align: start; // Магнит к началу блока
+  overflow: hidden;
+}
+
+/* --- Подложка со статусами (видна при свайпе) --- */
+.swipe-background {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1;
+  font-size: 1.5rem;
+  font-weight: bold;
+
+  .skip-bg, .confirm-bg {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    transition: opacity 0.2s ease;
+  }
+
+  .skip-bg {
+    background-color: $tg-destructive-text-color; // Красный из темы TG
+    color: #fff;
+    justify-content: flex-start;
+  }
+
+  .confirm-bg {
+    background-color: $tg-button-color; // Синий/Акцентный из темы TG
+    color: $tg-button-text-color;
+    justify-content: flex-end;
+  }
+}
+
+/* --- Основная карточка задачи --- */
+.task-card {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 2;
+  background-color: $tg-bg-color;
+  color: $tg-text-color;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+
+  // Плавный возврат на место, если отпустили недосвайпнув
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  // Когда мы тапаем и тянем, отключаем transition, чтобы карточка следовала за пальцем
+  &.swiping {
+    transition: none;
+  }
+
+  // Скрываем карточку полностью после выбора
+  &.answered {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.task-header {
+  margin-bottom: 30px;
+  h2 {
+    font-size: 1.25rem;
+    line-height: 1.4;
+  }
+}
+
+/* --- Варианты ответов --- */
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option-btn {
+  background-color: $tg-secondary-bg-color;
+  color: $tg-text-color;
+  border: 1px solid $tg-hint-color;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 1rem;
+  text-align: left;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  // Стиль выбранного варианта
+  &.selected {
+    background-color: $tg-button-color;
+    color: $tg-button-text-color;
+    border-color: $tg-button-color;
+    transform: scale(1.02);
+  }
+}
+
+.swipe-hint {
+  margin-top: auto;
+  text-align: center;
+  color: $tg-hint-color;
+  font-size: 0.9rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
