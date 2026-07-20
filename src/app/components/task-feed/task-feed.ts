@@ -1,9 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService, Question } from '../../services/api.service';
 import { firstValueFrom } from 'rxjs';
-import { Telegram } from '../../telegram/telegram';
 
 export interface FeedTask extends Question {
   selectedOption: number | null;
@@ -17,10 +16,14 @@ export interface FeedTask extends Question {
   imports: [CommonModule],
   templateUrl: './task-feed.html',
   styleUrl: './task-feed.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TaskFeed implements OnInit {
   tasks = signal<FeedTask[]>([]);
   currentIndex = signal<number>(0);
+
+  showResultPopup = signal<boolean>(false);
+  isLastAnswerCorrect = signal<boolean>(false);
 
   currentTask = computed(() => {
     const allTasks = this.tasks();
@@ -60,8 +63,8 @@ export class TaskFeed implements OnInit {
         status: 'pending'
       }));
       this.tasks.update(t => [...t, ...newTasks]);
-    } catch (error) {
-      console.error('Error loading more tasks:', error);
+    } catch (e) {
+      console.error('Failed to load tasks', e);
     }
   }
 
@@ -83,8 +86,8 @@ export class TaskFeed implements OnInit {
   }
 
   onTouchStart(event: TouchEvent, task: FeedTask) {
-    // Убрали проверку на !task.selectedOption. Теперь свайпать можно всегда.
-    if (task.status !== 'pending') return;
+    // Свайпать можно только если выбран вариант ответа
+    if (!task.selectedOption || task.status !== 'pending') return;
 
     this.startX = event.touches[0].clientX;
     task.isSwiping = true;
@@ -95,14 +98,9 @@ export class TaskFeed implements OnInit {
     if (!task.isSwiping) return;
 
     this.currentX = event.touches[0].clientX;
-    let deltaX = this.currentX - this.startX;
+    const deltaX = this.currentX - this.startX;
 
-    // Если ответ НЕ выбран, не даем полноценно свайпать влево (на подтверждение).
-    // Создаем эффект "резинки" (сильное сопротивление движению влево).
-    if (!task.selectedOption && deltaX < 0) {
-      deltaX = deltaX * 0.15;
-    }
-
+    // Блокируем свайп, если он слишком слабый (защита от случайных дрожаний)
     task.swipeOffset = deltaX;
     this.updateTask(task);
   }
@@ -111,20 +109,18 @@ export class TaskFeed implements OnInit {
     if (!task.isSwiping) return;
     task.isSwiping = false;
 
-    // Свайп влево (отрицательный offset) -> Подтвердить (только если ВЫБРАН ОТВЕТ)
-    if (task.swipeOffset < -this.SWIPE_THRESHOLD && task.selectedOption) {
+    // Свайп влево (отрицательный offset) -> Подтвердить (Confirm)
+    if (task.swipeOffset < -this.SWIPE_THRESHOLD) {
       this.confirmTask(task);
     }
-    // Свайп вправо (положительный offset) -> Пропустить (можно БЕЗ ответа)
+    // Свайп вправо (положительный offset) -> Пропустить (Skip)
     else if (task.swipeOffset > this.SWIPE_THRESHOLD) {
       this.skipTask(task);
     }
-    // Если недотянули или пытались свайпнуть влево без ответа — возвращаем на место
+    // Возврат в исходное положение
     else {
       task.swipeOffset = 0;
     }
-
-    this.updateTask(task);
   }
 
   private confirmTask(task: FeedTask) {
@@ -133,13 +129,24 @@ export class TaskFeed implements OnInit {
     this.updateTask(task);
 
     if (task.selectedOption !== null) {
-      // Fire the API call asynchronously without blocking the UI transition
-      this.apiService.submitAnswer(task.id, task.selectedOption).subscribe({
-        error: (e) => console.error('Submit answer failed', e)
-      });
-    }
+      this.apiService.submitAnswer(task.id, { optionId: task.selectedOption }).subscribe({
+        next: (result) => {
+          this.isLastAnswerCorrect.set(result.correct);
+          this.showResultPopup.set(true);
 
-    setTimeout(() => this.nextTask(), 300);
+          setTimeout(() => {
+            this.showResultPopup.set(false);
+            this.nextTask();
+          }, 1500); // Show popup for 1.5 seconds
+        },
+        error: (e) => {
+          console.error('Submit answer failed', e);
+          this.nextTask();
+        }
+      });
+    } else {
+      setTimeout(() => this.nextTask(), 300);
+    }
   }
 
   private skipTask(task: FeedTask) {
