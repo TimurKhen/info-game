@@ -10,18 +10,18 @@
   </div>
 
   <div class="task-container" *ngIf="currentTask()">
-    <!-- Бекграунд, который видно при свайпе (Подложка) -->
+
     <div class="swipe-background">
       <div class="skip-bg" [style.opacity]="currentTask()!.swipeOffset > 0 ? 1 : 0">
         <span>Пропустить</span>
       </div>
-      <!-- Показываем зеленую подложку только если выбран ответ -->
+
       <div class="confirm-bg" [style.opacity]="(currentTask()!.swipeOffset < 0 && currentTask()!.selectedOption) ? 1 : 0">
         <span>Подтвердить</span>
       </div>
     </div>
 
-    <!-- Основная карточка задачи -->
+
     <div class="task-card"
          [class.swiping]="currentTask()!.isSwiping"
          [class.answered]="currentTask()!.status !== 'pending'"
@@ -40,7 +40,7 @@
       </div>
 
       <div class="options-list">
-        <button *ngFor="let option of currentTask()!.options"
+        <button matRipple *ngFor="let option of currentTask()!.options"
                 class="option-btn"
                 [class.selected]="currentTask()!.selectedOption === option.id"
                 (click)="selectOption(currentTask()!, option.id)">
@@ -69,8 +69,8 @@
     <div class="completion-content">
       <h2>Congratulations!</h2>
       <p>You solved everything from group {{ currentTopicName() || 'this topic' }}</p>
-      <img src="/fullduckstwo_agadkaiaatonuuc.gif" alt="Duck Celebration" class="completion-gif" />
-      <button class="tg-btn-primary back-btn" (click)="backToTopics()">Back to select questions</button>
+      <img src="/fullduckstwo_cool.gif" alt="Duck Celebration" class="completion-gif" />
+      <button matRipple class="tg-btn-primary" (click)="backToTopics()">Back to select questions</button>
     </div>
   </div>
 </div>
