@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ApiService, Topic } from '../../services/api.service';
 import { QuizStateService } from '../../services/quiz-state.service';
+import { MatRipple } from '@angular/material/core';
 
 @Component({
   selector: 'app-quiz-start',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatRipple],
   templateUrl: './quiz-start.html',
   styleUrl: './quiz-start.scss',
 })
@@ -28,6 +29,10 @@ export class QuizStartComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit(): void {
+    if (this.hasActiveSession()) {
+      this.continuePlaying();
+    }
+
     this.apiService.getTopics().subscribe((topics) => {
       this.topics.set(topics);
     });
@@ -53,9 +58,9 @@ export class QuizStartComponent implements OnInit {
 
     if (topic !== null) {
       queryParams.topic = topic;
-      const selectedTopicObj = this.topics().find(t => t.id === topic);
+      const selectedTopicObj = this.topics().find((t) => t.id === topic);
       if (selectedTopicObj) {
-         queryParams.topicName = selectedTopicObj.name;
+        queryParams.topicName = selectedTopicObj.name;
       }
     }
 

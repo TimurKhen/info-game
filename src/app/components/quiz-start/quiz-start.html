@@ -2,17 +2,16 @@
   <h2>Выберите тему</h2>
   <div class="topics-options">
     @for (item of topics(); track item; let i = $index) {
-      <button class="tg-btn-outline" (click)="selectTheme(i, item.id)" [class.active]="selectedTheme() === i">{{item.name}}</button>
+      <button matRipple class="tg-btn-outline" (click)="selectTheme(i, item.id)" [class.active]="selectedTheme() === i">{{item.name}}</button>
     }
   </div>
 
   <h2>Выберите сложность</h2>
   <div class="difficulty-options">
-    <button class="tg-btn-outline" (click)="selectDifficulty(1)" [class.active]="selectedDifficulty() === 1">Easy</button>
-    <button class="tg-btn-outline" (click)="selectDifficulty(2)" [class.active]="selectedDifficulty() === 2">Medium</button>
-    <button class="tg-btn-outline" (click)="selectDifficulty(3)" [class.active]="selectedDifficulty() === 3">Hard</button>
+    <button matRipple class="tg-btn-outline" (click)="selectDifficulty(1)" [class.active]="selectedDifficulty() === 1">Easy</button>
+    <button matRipple class="tg-btn-outline" (click)="selectDifficulty(2)" [class.active]="selectedDifficulty() === 2">Medium</button>
+    <button matRipple class="tg-btn-outline" (click)="selectDifficulty(3)" [class.active]="selectedDifficulty() === 3">Hard</button>
   </div>
 
-  <button class="tg-btn-primary" (click)="startTasks()">Start</button>
-  <button class="tg-btn-primary continue-btn" *ngIf="hasActiveSession()" (click)="continuePlaying()" style="margin-top: 10px; background-color: var(--tg-theme-button-color, #2481cc);">Continue playing</button>
+  <button matRipple class="tg-btn-primary" (click)="startTasks()">Начать</button>
 </div>

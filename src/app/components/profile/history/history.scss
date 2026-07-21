@@ -1,6 +1,5 @@
 @import 'tgColors.scss';
 
-/* --- Основная карточка задачи --- */
 .task-card {
   z-index: 2;
   background: rgba(255, 255, 255, 0.1);
@@ -14,15 +13,12 @@
   flex-direction: column;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
 
-  // Плавный возврат на место, если отпустили недосвайпнув
   transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s;
 
-  // Когда мы тапаем и тянем, отключаем transition, чтобы карточка следовала за пальцем
   &.swiping {
     transition: none;
   }
 
-  // Скрываем карточку полностью после выбора
   &.answered {
     opacity: 0.5;
     pointer-events: none;
@@ -43,6 +39,7 @@
       .correct {
         color: rgba(46, 204, 113, 0.4);
       }
+
       .incorrect {
         color: $tg-destructive-text-color;
       }
@@ -66,7 +63,6 @@
   }
 }
 
-/* --- Варианты ответов --- */
 .options-list {
   display: flex;
   flex-direction: column;
@@ -104,6 +100,7 @@
       background: rgba(46, 204, 113, 0.15);
       border-color: rgba(46, 204, 113, 0.4);
     }
+
     &.incorrect {
       background: rgba(231, 76, 60, 0.15);
       border-color: rgba(231, 76, 60, 0.4);

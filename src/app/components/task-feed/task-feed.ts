@@ -1,10 +1,13 @@
-import { Component, OnInit, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AnswerResult, ApiService, Question } from '../../services/api.service';
 import { firstValueFrom } from 'rxjs';
 import { Telegram } from '../../telegram/telegram';
 import { QuizStateService } from '../../services/quiz-state.service';
+import { MatRipple } from '@angular/material/core';
+import { BackButton } from '../../telegram/back-button/back-button';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface FeedTask extends Question {
   selectedOption: number | null;
@@ -15,11 +18,11 @@ export interface FeedTask extends Question {
 
 @Component({
   selector: 'app-task-feed',
-  imports: [CommonModule],
+  imports: [CommonModule, MatRipple],
   templateUrl: './task-feed.html',
   styleUrl: './task-feed.scss',
 })
-export class TaskFeed implements OnInit {
+export class TaskFeed implements OnInit, OnDestroy {
   quizStateService = inject(QuizStateService);
   tasks = signal<FeedTask[]>([]);
   currentIndex = signal<number>(0);
@@ -32,21 +35,44 @@ export class TaskFeed implements OnInit {
 
   isFinished = computed(() => this.quizStateService.isFinished());
   currentTopicName = computed(() => this.quizStateService.currentTopicName());
-
+  feedbackState = signal<'correct' | 'incorrect' | null>(null);
+  feedbackMessage = signal<string>('');
   // Переменные для отслеживания свайпа
   private startX = 0;
   private currentX = 0;
   private readonly SWIPE_THRESHOLD = 120; // Пикселей для срабатывания
-
   private currentTopic: number | undefined;
   private currentDifficulty: number | undefined;
-  feedbackState = signal<'correct' | 'incorrect' | null>(null);
-  feedbackMessage = signal<string>('');
 
-  constructor(private telegram: Telegram, private apiService: ApiService, private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private telegram: Telegram,
+    private apiService: ApiService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private backButton: BackButton,
+    private destroyRef: DestroyRef,
+  ) {}
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
+    this.setUpBackButton();
+    this.getRouteParams();
+  }
+
+  ngOnDestroy() {
+    this.backButton.hide();
+  }
+
+  setUpBackButton() {
+    this.backButton.show();
+
+    this.backButton.click$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.quizStateService.clearState();
+      this.router.navigate(['/']);
+    });
+  }
+
+  getRouteParams() {
+    this.route.queryParams.subscribe((params) => {
       if (params['resume'] === 'true') {
         this.tasks.set(this.quizStateService.tasks());
         this.currentIndex.set(this.quizStateService.currentIndex());
@@ -62,7 +88,7 @@ export class TaskFeed implements OnInit {
         this.quizStateService.currentTopic.set(this.currentTopic);
         this.quizStateService.currentDifficulty.set(this.currentDifficulty);
         if (topicName) {
-           this.quizStateService.currentTopicName.set(topicName);
+          this.quizStateService.currentTopicName.set(topicName);
         }
 
         this.tasks.set([]);
@@ -74,21 +100,23 @@ export class TaskFeed implements OnInit {
 
   async loadMoreTasks() {
     try {
-      const newQuestions = await firstValueFrom(this.apiService.getFeed(this.currentDifficulty, this.currentTopic, 10));
+      const newQuestions = await firstValueFrom(
+        this.apiService.getFeed(this.currentDifficulty, this.currentTopic, 10),
+      );
 
       if (newQuestions.length === 0) {
         this.quizStateService.isFinished.set(true);
         return;
       }
 
-      const newTasks: FeedTask[] = newQuestions.map(q => ({
+      const newTasks: FeedTask[] = newQuestions.map((q) => ({
         ...q,
         selectedOption: null,
         swipeOffset: 0,
         isSwiping: false,
-        status: 'pending'
+        status: 'pending',
       }));
-      this.tasks.update(t => {
+      this.tasks.update((t) => {
         const updatedTasks = [...t, ...newTasks];
         this.quizStateService.tasks.set(updatedTasks);
         return updatedTasks;
@@ -104,20 +132,12 @@ export class TaskFeed implements OnInit {
     this.updateTask(task);
   }
 
-  private updateTask(updatedTask: FeedTask) {
-    this.tasks.update(tasks => {
-       const updatedTasks = tasks.map(t => t.id === updatedTask.id ? { ...updatedTask } : t);
-       this.quizStateService.tasks.set(updatedTasks);
-       return updatedTasks;
-    });
-  }
-
-  // === Логика свайпов ===
-
   getTransform(task: FeedTask): string {
     const rotation = task.swipeOffset * 0.05; // 5 degrees per 100px
     return `translateX(${task.swipeOffset}px) rotateZ(${rotation}deg)`;
   }
+
+  // === Логика свайпов ===
 
   onTouchStart(event: TouchEvent, task: FeedTask) {
     // Убрали проверку на !task.selectedOption. Теперь свайпать можно всегда.
@@ -164,6 +184,19 @@ export class TaskFeed implements OnInit {
     this.updateTask(task);
   }
 
+  backToTopics() {
+    this.quizStateService.clearState();
+    this.router.navigate(['/quiz-start']);
+  }
+
+  private updateTask(updatedTask: FeedTask) {
+    this.tasks.update((tasks) => {
+      const updatedTasks = tasks.map((t) => (t.id === updatedTask.id ? { ...updatedTask } : t));
+      this.quizStateService.tasks.set(updatedTasks);
+      return updatedTasks;
+    });
+  }
+
   private confirmTask(task: FeedTask) {
     task.swipeOffset = -window.innerWidth;
     task.status = 'confirmed';
@@ -181,7 +214,7 @@ export class TaskFeed implements OnInit {
         error: (e) => {
           console.error('Submit answer failed', e);
           this.showDynamicIsland(false); // Default to error state if request fails
-        }
+        },
       });
     }
 
@@ -213,14 +246,9 @@ export class TaskFeed implements OnInit {
 
     // Check if we reached the end of the feed (no more tasks returned from API)
     if (nextIdx >= this.tasks().length) {
-       this.loadMoreTasks();
+      this.loadMoreTasks();
     } else if (nextIdx >= this.tasks().length - 3) {
       this.loadMoreTasks();
     }
-  }
-
-  backToTopics() {
-    this.quizStateService.clearState();
-    this.router.navigate(['/quiz-start']);
   }
 }
