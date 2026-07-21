@@ -81,7 +81,9 @@ export class ApiService {
   }
 
   getTopics(): Observable<Topic[]> {
-    return this.http.get<Topic[]>(`${this.baseUrl}/topics`);
+    return this.http.get<Topic[]>(`${this.baseUrl}/topics`).pipe(
+      tap((v) => this.telegram.alerter(JSON.stringify(v)))
+    );
   }
 
   getHistory(): Observable<HistoryQuestion[]> {
