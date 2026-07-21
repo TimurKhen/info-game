@@ -11,7 +11,7 @@ Frontend для Telegram Mini App: пользователю показывают
 
 ## Запуск
 
-Запуск через Docker: <ик>
+Запуск через Docker: <br>
 Соберите и запустите контейнер в фоновом режиме:
 
 `docker-compose up -d --build`
