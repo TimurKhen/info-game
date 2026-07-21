@@ -7,8 +7,20 @@
            calc(20px + var(--tg-safe-area-inset-left, 0px));
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-evenly;
   height: 100%;
+
+  .title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+
+    img {
+      width: 100px;
+      height: 100px;
+    }
+  }
 
   h2 {
     text-align: center;

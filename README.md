@@ -1,59 +1,45 @@
-# VibeTon
+# Info-game
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.7.
+Frontend для Telegram Mini App: пользователю показывают сниппет кода на Python и несколько вариантов ответа, нужно предсказать вывод программы. Приложение предлагает 3 уровня сложности и несколько различных тем на выбор.
 
-## Development server
+## Стек
+1) Angular v22
+2) Angular Material
+3) Telegram Mini App API
+4) RxJS
+5) Docker & Nginx (для продакшен-сборки)
 
-To start a local development server, run:
+## Запуск
 
-```bash
-ng serve
-```
+Запуск через Docker: <ик>
+Соберите и запустите контейнер в фоновом режиме:
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+`docker-compose up -d --build`
 
-## Code scaffolding
+Приложение будет доступно по адресу http://localhost:8080/ (порт можно изменить в docker-compose.yml).
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Основной функционал (Фичи)
+Кастомизация викторины: Выбор темы (Topic) и уровня сложности (Easy, Medium, Hard) перед началом игры.
 
-```bash
-ng generate component component-name
-```
+Tinder-like механика свайпов: - Свайп вправо — пропустить вопрос.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Свайп влево — подтвердить выбранный вариант ответа.
 
-```bash
-ng generate --help
-```
+Использован кастомный обработчик touch-событий с эффектом "резинки" для интуитивно понятного UI.
 
-## Building
+Dynamic Island уведомления: Всплывающие уведомления в стиле iOS на самом верху экрана (поверх контента), информирующие о правильном или неверном ответе после подтверждения.
 
-To build the project run:
+Глубокая интеграция с Telegram: обработка закрытия (Close Confirmation) и адаптация под безопасные зоны (Safe Areas) интерфейса мессенджера и получение темы пользователя.
 
-```bash
-ng build
-```
+## Структура проекта
+src/app/components/quiz-start/ — Экран выбора темы и сложности.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+src/app/components/task-feed/ — Основной экран с лентой задач, вариантами ответов, механикой свайпов и Dynamic Island.
 
-## Running unit tests
+src/app/components/profile/ — Профиль пользователя с историей ответов.
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+src/app/telegram/ — Сервисы и утилиты для работы с нативным API Telegram Mini Apps.
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## CI/CD
+Проект включает настроенный GitHub Actions workflow (.github/workflows/deploy.yaml).
+При пуше в ветку main автоматически запускается процесс сборки Angular-приложения, создания Docker-образа и его отправки в GitHub Container Registry (GHCR).
