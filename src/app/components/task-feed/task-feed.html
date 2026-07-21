@@ -67,10 +67,10 @@
 
   <div class="completion-popup" *ngIf="isFinished()">
     <div class="completion-content">
-      <h2>Congratulations!</h2>
-      <p>You solved everything from group {{ currentTopicName() || 'this topic' }}</p>
+      <h2>Поздравляем!</h2>
+      <p>Вы прорешали все задачи из {{ currentTopicName() || 'этой темы' }}</p>
       <img src="/fullduckstwo_cool.gif" alt="Duck Celebration" class="completion-gif" />
-      <button matRipple class="tg-btn-primary" (click)="backToTopics()">Back to select questions</button>
+      <button matRipple class="tg-btn-primary" (click)="backToTopics()">Вернуться к выбору вопросов</button>
     </div>
   </div>
 </div>
