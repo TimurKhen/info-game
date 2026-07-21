@@ -1,7 +1,8 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ApiService, Topic } from '../../services/api.service';
+import { QuizStateService } from '../../services/quiz-state.service';
 
 @Component({
   selector: 'app-quiz-start',
@@ -12,6 +13,11 @@ import { ApiService, Topic } from '../../services/api.service';
 })
 export class QuizStartComponent implements OnInit {
   private apiService = inject(ApiService);
+  private quizStateService = inject(QuizStateService);
+
+  hasActiveSession = computed(() => {
+    return this.quizStateService.tasks().length > 0 && !this.quizStateService.isFinished();
+  });
 
   selectedDifficulty = signal<number | null>(null);
   selectedTheme = signal<number | null>(null);
@@ -47,8 +53,16 @@ export class QuizStartComponent implements OnInit {
 
     if (topic !== null) {
       queryParams.topic = topic;
+      const selectedTopicObj = this.topics().find(t => t.id === topic);
+      if (selectedTopicObj) {
+         queryParams.topicName = selectedTopicObj.name;
+      }
     }
 
     this.router.navigate(['/feed'], { queryParams });
+  }
+
+  continuePlaying() {
+    this.router.navigate(['/feed'], { queryParams: { resume: 'true' } });
   }
 }

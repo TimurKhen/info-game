@@ -61,7 +61,16 @@
     </div>
   </div>
 
-  <div class="no-tasks" *ngIf="!currentTask()">
+  <div class="no-tasks" *ngIf="!currentTask() && !isFinished()">
     <p>Loading more tasks...</p>
+  </div>
+
+  <div class="completion-popup" *ngIf="isFinished()">
+    <div class="completion-content">
+      <h2>Congratulations!</h2>
+      <p>You solved everything from group {{ currentTopicName() || 'this topic' }}</p>
+      <img src="/fullduckstwo_agadkaiaatonuuc.gif" alt="Duck Celebration" class="completion-gif" />
+      <button class="tg-btn-primary back-btn" (click)="backToTopics()">Back to select questions</button>
+    </div>
   </div>
 </div>

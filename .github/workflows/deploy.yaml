@@ -1,60 +1,15 @@
-name: Build and Deploy Angular App
-
+name: Deploy
 on:
   push:
-    branches:
-      - main
-
-# Ensure permissions to push to GitHub Container Registry
-permissions:
-  contents: read
-  packages: write
+    branches: [master]
 
 jobs:
-  build-and-push-docker:
-    runs-on: ubuntu-latest
-
+  deploy:
+    runs-on: self-hosted
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      # Standard check to ensure the app builds successfully locally before Docker
-      - name: Install dependencies and Build (Test)
+      - uses: actions/checkout@v4
+      - name: Deploy
         run: |
-          npm ci
-          npm run build --configuration=production
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub Container Registry (GHCR)
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/vibe-ton:latest
-
-      # Example: SSH into your VPS to pull the latest image and restart
-      # - name: Deploy via SSH to Server
-      #   uses: appleboy/ssh-action@v1.0.3
-      #   with:
-      #     host: ${{ secrets.SERVER_HOST }}
-      #     username: ${{ secrets.SERVER_USER }}
-      #     key: ${{ secrets.SERVER_SSH_KEY }}
-      #     script: |
-      #       docker pull ghcr.io/${{ github.repository_owner }}/vibe-ton:latest
-      #       docker-compose down
-      #       docker-compose up -d
+          cd /home/gshorti/src/info-game/
+          git pull
+          docker compose up -d --build
